@@ -1,2 +1,1 @@
-# node-ts
-node server by Typescript
+# node-orm
