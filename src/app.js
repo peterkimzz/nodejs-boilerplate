@@ -42,3 +42,5 @@ app.use((err, req, res, next) => {
 const server = app.listen(PORT, () => {
   console.log(`Server listening on https://${HOST}:${PORT}`)
 })
+
+module.exports = app

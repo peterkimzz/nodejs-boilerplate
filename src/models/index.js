@@ -2,19 +2,24 @@ import fs from 'fs'
 import path from 'path'
 
 const Sequelize = require('sequelize')
-const config = require(__dirname + '/../configs/sequelize.js')
-const basename = path.basename(__filename) // index.js
+const env = process.env.NODE_ENV
+const config = require(__dirname + '/../configs/sequelize.js')[env]
+const basename = path.basename(__filename)
+
 const models = {}
+let sequelize
 
-// init
-const sequelize = new Sequelize(
-  config.database,
-  config.username,
-  config.password,
-  config
-)
+if (config.use_env_variable) {
+  sequelize = new Sequelize(process.env[config.use_env_variable], config)
+} else {
+  sequelize = new Sequelize(
+    config.database,
+    config.username,
+    config.password,
+    config
+  )
+}
 
-// mapping
 fs.readdirSync(__dirname)
   .filter(
     file =>
@@ -36,10 +41,4 @@ Object.keys(models).forEach(modelName => {
 models.sequelize = sequelize
 models.Sequelize = Sequelize
 
-// test for connection
-sequelize
-  .authenticate()
-  .then(() => console.log('sequelize connection succeed'))
-  .catch(err => console.log('sequelize connection failed', err))
-
-export { models }
+export default models

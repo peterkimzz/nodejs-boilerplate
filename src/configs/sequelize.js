@@ -22,7 +22,6 @@ const baseDbSetting = {
   }
 }
 
-// 이렇게 나누는 이유가 `$ sequelize db:migrate` 명령어를 입력할 때 key값을 알아서 찾아주는 듯
 module.exports = {
   production: Object.assign(
     {
@@ -35,7 +34,7 @@ module.exports = {
   development: Object.assign(
     {
       database: process.env.DB_DEV,
-      logging: true
+      logging: console.log
     },
     baseDbSetting
   ),
