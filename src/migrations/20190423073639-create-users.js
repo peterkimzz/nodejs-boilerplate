@@ -12,7 +12,8 @@ module.exports = {
       email: {
         allowNull: false,
         unique: true,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        comment: 'This is a column name that has an email.'
       },
       password: {
         allowNull: false,

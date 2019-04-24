@@ -3,12 +3,11 @@ import path from 'path'
 
 const Sequelize = require('sequelize')
 const config = require(__dirname + '/../configs/sequelize.js')
-const basename = path.basename(__filename)
+const basename = path.basename(__filename) // index.js
 const models = {}
 
 // init
-let sequelize
-sequelize = new Sequelize(
+const sequelize = new Sequelize(
   config.database,
   config.username,
   config.password,

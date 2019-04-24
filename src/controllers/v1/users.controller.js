@@ -6,7 +6,7 @@ const get = async (req, res, next) => {
 
     return res.json(users)
   } catch (e) {
-    next(e)
+    return next(e)
   }
 }
 
