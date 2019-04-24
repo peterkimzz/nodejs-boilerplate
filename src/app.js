@@ -5,6 +5,8 @@ import express from 'express'
 import cookieParser from 'cookie-parser'
 import logger from 'morgan'
 import router from './routes'
+import response from './utils/response'
+import jwtMiddleware from './middlewares/jwt.middleware'
 
 const app = express()
 const HOST = process.env.HOST
@@ -15,14 +17,13 @@ app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser(COOKIE_SECRET))
+app.use(jwtMiddleware)
 app.use(router)
 
-// catch 404 and forward to error handler
 app.use((req, res, next) => {
   next(createError(404))
 })
 
-// error handler
 app.use((err, req, res, next) => {
   let apiError = err
 
@@ -35,7 +36,13 @@ app.use((err, req, res, next) => {
   res.locals.error = process.env.NODE_ENV === 'development' ? apiError : {}
 
   // render the error page
-  return res.status(apiError.status).json({ message: apiError.message })
+  return response(
+    res,
+    {
+      message: apiError.message
+    },
+    apiError.status
+  )
 })
 
 // open server

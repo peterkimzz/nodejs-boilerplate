@@ -1,6 +1,8 @@
 'use strict'
 
 import { uuid } from '../utils/uuid'
+import bcrypt from 'bcrypt'
+import userCache from '../caches/users.cache'
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
@@ -44,6 +46,8 @@ module.exports = (sequelize, DataTypes) => {
       user.password = await bcrypt.hash(user.password, salt)
     }
   })
+
+  User.afterSave((user, options) => userCache.store(user))
 
   // print
   User.prototype.toWeb = function() {
