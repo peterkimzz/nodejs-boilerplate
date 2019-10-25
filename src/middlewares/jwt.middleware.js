@@ -1,35 +1,53 @@
-import createError from 'http-errors'
 import jwt from 'jsonwebtoken'
-import userCache from '../caches/users.cache'
+import userRepo from '../repositories/users.repository'
 
 export default async (req, res, next) => {
   try {
-    req.user = null
+    req.auth = null
+    let token
 
-    if (req.headers.authorization) {
-      let uuid
-      jwt.verify(
-        req.headers.authorization.split(' ')[1],
-        process.env.JWT_SECRET,
-        (err, payload) => {
-          if (err) {
-            return next(createError(401, '토큰 정보가 유효하지 않습니다.'))
-          }
+    // 쿠키에서 찾기
+    if (req.cookies.token) {
+      token = req.cookies.token
+    }
+    // 헤더에서 찾기
+    else if (req.headers.authorization) {
+      token = req.headers.authorization.split(' ')[1]
+    }
+    // 토큰이 없으면 넘기기
+    else {
+      return next()
+    }
 
-          uuid = payload.uuid
-        }
-      )
+    // JWT 해독
+    const payload = jwt.verify(token, process.env.JWT_SECRET)
+    if (!payload) {
+      console.error('jwt expired', payload)
+      return next()
+    }
 
-      const user = await userCache.find(uuid)
-      if (!user) {
-        return next(createError(404, '사용자를 찾을 수 없습니다.'))
-      }
+    // UUID로 유저 찾기
+    const uuid = payload.uuid
+    const user = await userRepo.findByUUID(uuid)
+    // 유저가 DB에서 강제로 삭제됐을 때
+    if (!user) {
+      console.error('\nUserDataForceDeleted\n')
+      res.cookie('token', '')
+      return next()
+    }
 
-      req.user = user
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`\njwt middleware:\n`, user.toWeb(), '\n')
+    }
+
+    // Globalize
+    req.auth = {
+      token,
+      user: user.toWeb()
     }
 
     next()
-  } catch (e) {
-    next(e)
+  } catch (err) {
+    next(err)
   }
 }

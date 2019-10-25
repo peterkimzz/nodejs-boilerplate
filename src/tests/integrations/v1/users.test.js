@@ -3,7 +3,7 @@ import randomString from 'random-string'
 import { uuid } from '../../../utils/uuid'
 import models from '../../../models'
 
-const app = require('../../../app')
+const { app, server } = require('../../../app')
 
 let user
 

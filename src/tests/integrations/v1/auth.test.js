@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken'
 import models from '../../../models'
 import userRepo from '../../../repositories/users.repository'
 
-const app = require('../../../app')
+const { app, server } = require('../../../app')
 
 afterAll(() => models.sequelize.close())
 

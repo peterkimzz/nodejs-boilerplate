@@ -6,6 +6,9 @@ import cookieParser from 'cookie-parser'
 import logger from 'morgan'
 import router from './routes'
 import response from './utils/response'
+import models from './models'
+
+import corsMiddleware from './middlewares/cors.middleware'
 import jwtMiddleware from './middlewares/jwt.middleware'
 
 const app = express()
@@ -17,6 +20,7 @@ app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser(COOKIE_SECRET))
+app.use(corsMiddleware)
 app.use(jwtMiddleware)
 app.use(router)
 
@@ -45,9 +49,17 @@ app.use((err, req, res, next) => {
   )
 })
 
+models.sequelize
+  .sync()
+  .then(_ => console.log('\nDB Connetion Succeed\n'))
+  .catch(err => console.log('\nDB Connetion Failed\n', err))
+
 // open server
 const server = app.listen(PORT, () => {
   console.log(`Server listening on https://${HOST}:${PORT}`)
 })
 
-module.exports = app
+module.exports = {
+  app,
+  server
+}

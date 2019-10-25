@@ -1,8 +1,6 @@
-import httpStatus from 'http-status'
 import createError from 'http-errors'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import userCache from '../../caches/users.cache'
 import userRepo from '../../repositories/users.repository'
 import response from '../../utils/response'
 
@@ -10,7 +8,7 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body
 
-    const user = await userCache.findByEmail(email)
+    const user = await userRepo.findByEmail(email)
     if (!user) return next(createError(404, '사용자를 찾을 수 없습니다.'))
 
     const match = await bcrypt.compare(password, user.password)
